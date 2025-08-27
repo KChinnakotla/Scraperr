@@ -1,0 +1,28 @@
+# Build artifacts
+/build/
+/Debug/
+/Release/
+*.exe
+*.obj
+*.pdb
+*.ilk
+*.dll
+*.log
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+cpp_scraper.sln
+*.vcxproj
+*.vcxproj.filters
+
+# Scraper output data
+/data/
+/.vscode/
+
+# OS/editor files
+*.user
+*.suo
+*.DS_Store
+Thumbs.db
