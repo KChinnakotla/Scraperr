@@ -61,3 +61,40 @@ FetchResult Fetcher::get(const std::string& url, long timeout_ms, bool follow_re
     curl_easy_cleanup(curl);
     return res;
 }
+
+FetchResult Fetcher::post_form(const std::string& url, const std::string& form) {
+    FetchResult res;
+    CURL* curl = curl_easy_init();
+    if (!curl) { res.error = "curl_easy_init failed"; return res; }
+
+    char errbuf[CURL_ERROR_SIZE]{0};
+    std::string body;
+    using namespace std::chrono;
+    auto t0 = steady_clock::now();
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "cpp-scraper/0.1");
+    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+    curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "");
+    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, form.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &body);
+
+    CURLcode code = curl_easy_perform(curl);
+    auto t1 = steady_clock::now();
+    res.duration_ms = duration_cast<milliseconds>(t1 - t0).count();
+
+    if (code != CURLE_OK) {
+        res.error = errbuf[0] ? std::string(errbuf) : curl_easy_strerror(code);
+        curl_easy_cleanup(curl);
+        return res;
+    }
+    long status = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
+    res.http_status = status;
+    res.body = std::move(body);
+    curl_easy_cleanup(curl);
+    return res;
+}
+

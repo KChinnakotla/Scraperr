@@ -15,3 +15,11 @@ add_executable(scraper
 
 target_include_directories(scraper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(scraper PRIVATE CURL::libcurl)
+
+add_executable(worker
+  src/worker_main.cpp
+  src/fetcher.cpp
+)
+target_include_directories(worker PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(worker PRIVATE CURL::libcurl)
+
